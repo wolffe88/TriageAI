@@ -27,7 +27,7 @@ def tts(request):
     payload = {"text": body["text"]}
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{body['voice_id']}"
     resp = requests.post(url, headers=HEADERS, json=payload)
-    return HttpResponse(resp.content, content_type="audio/mpeg")  # return MP3 bytes
+    return HttpResponse(resp.content, content_type="audio/mpeg")  
 
 def index(request):
     return render(request, "app/index.html")
@@ -35,7 +35,7 @@ def index(request):
 
 
 def generate(request):
-    prompt = request.GET.get("prompt", "")               # grab ?prompt=... from URL
-    result = generator(prompt, max_new_tokens=100)[0]    # generate up to 100 tokens
+    prompt = request.GET.get("prompt", "")           
+    result = generator(prompt, max_new_tokens=100)[0]   
     return JsonResponse({"text": result["generated_text"]})  
 
