@@ -38,7 +38,6 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 console.log('Microphone permission granted');
-                // Stop the stream since we only needed it for permission
                 stream.getTracks().forEach(track => track.stop());
             } catch (err) {
                 console.error('Microphone permission denied:', err);
@@ -48,6 +47,42 @@
 
         // Request permission when page loads
         document.addEventListener('DOMContentLoaded', requestVoicePermission);
+    </script>
+    <!-- <script>
+        function speak(text) {
+            speechSynthesis.cancel();                      
+            const msg = new SpeechSynthesisUtterance(text); 
+            msg.lang = 'en-US';                        
+            msg.onend = () => console.log('✅ Done speaking'); 
+            speechSynthesis.speak(msg);                  
+        }
+    </script> -->
+    <script>
+        async function loadVoices() {
+          const resp = await fetch("/voices/");              // fetch available voices
+          const { voices } = await resp.json();
+          voices.forEach(v => {
+            const o = document.createElement("option");
+            o.value = v.voice_id; o.text = v.name;
+            document.getElementById("voice-select").append(o);
+          });
+        }
+        async function speak() {
+          const text = document.getElementById("transcript").innerText;
+          const voice = document.getElementById("voice-select").value;
+          const resp = await fetch("/tts/", {
+            method:"POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({text, voice_id: voice})
+          });
+          const audioBlob = await resp.blob();                // get MP3 bytes
+          new Audio(URL.createObjectURL(audioBlob)).play();    // play it
+        }
+        window.onload = loadVoices();                          // populate voices on load
+
+        // Request permission when page loads
+        document.addEventListener('DOMContentLoaded', requestVoicePermission);
+
     </script>
 </head>
 <body class="bg-bg-100 min-h-screen p-8 flex items-center justify-center">
@@ -61,27 +96,55 @@
         <div class="bg-bg-200 bg-opacity-50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
 
             <div class="h-64 mb-8 bg-bg-300 bg-opacity-30 rounded-2xl p-6">
-                <div class="text-text-200 opacity-80">
+                <div id="transcript" class="text-text-200 opacity-80">
                     Hi, I'm Triage Ai. How can I assist you today?
                 </div>
             </div>
 
             <!-- Voice Button -->
-            <div class="flex justify-center">
-                <button 
-                onclick=""
-                    class="w-32 h-32 rounded-full bg-primary-100 bg-opacity-20 backdrop-blur-md flex items-center justify-center group transition-all hover:bg-opacity-30">
-                    <div class="w-24 h-24 rounded-full bg-primary-200 bg-opacity-40 flex items-center justify-center group-hover:scale-95 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-text-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                        </svg>
+            <div class="flex justify-center items-center gap-6">
+                <div class="flex flex-col items-center">
+                    <button     
+                        class="w-32 h-32 rounded-full bg-primary-100 bg-opacity-20 backdrop-blur-md flex items-center justify-center group transition-all hover:bg-opacity-30">
+                        <div class="w-24 h-24 rounded-full bg-primary-200 bg-opacity-40 flex items-center justify-center group-hover:scale-95 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-text-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                        </div>
+                    </button>
+                    <p class="text-text-200 text-sm mt-4">Press To Talk Your Symptom</p>
+                </div>
+                <div class="flex flex-col gap-4 w-full max-w-md">
+                    <div class="flex gap-3">
+                        <select id="voice-select" 
+                            class="flex-1 bg-bg-300 bg-opacity-50 text-text-100 rounded-xl p-3 border border-primary-200 border-opacity-30 focus:outline-none focus:border-primary-200">
+                            <option value="" disabled selected>Please select a voice type...</option>
+                        </select>
+                        <button 
+                            onclick="speak()"
+                            class="px-6 rounded-xl bg-primary-100 bg-opacity-20 backdrop-blur-md hover:bg-opacity-30 text-text-100 flex items-center justify-center transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.728-2.728" />
+                            </svg>
+                        </button>
                     </div>
-                </button>
+                    
+                    <div class="flex gap-3">
+                        <input id="input" 
+                            class="flex-1 bg-bg-300 bg-opacity-50 text-text-100 rounded-xl p-3 border border-primary-200 border-opacity-30 placeholder-text-200 placeholder-opacity-50 focus:outline-none focus:border-primary-200"
+                            placeholder="Describe your symptoms..."
+                        />
+                        <button 
+                            onclick="submit()"
+                            class="px-6 rounded-xl bg-primary-100 bg-opacity-20 backdrop-blur-md hover:bg-opacity-30 text-text-100 flex items-center justify-center transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="text-center mt-6">
-                <p class="text-text-200 text-sm">Press To Talk Your Symptom</p>
-            </div>
         </div>
     </main>
 </body>

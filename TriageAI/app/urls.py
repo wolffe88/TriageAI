@@ -1,4 +1,8 @@
 from django.urls import path
-from .views import index
+from .views import index, get_voices, tts
 
-urlpatterns = [ path("", index, name="index") ]
+urlpatterns = [ 
+    path("", index, name="index"),
+    path("voices/", get_voices),
+    path("tts/", tts),
+]
