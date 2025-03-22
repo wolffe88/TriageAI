@@ -1,3 +1,85 @@
-<html>
-    <h1>Hi</h1>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triage Ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            100: '#6c35de',
+                            200: '#a364ff',
+                            300: '#ffc7ff',
+                        },
+                        accent: {
+                            100: '#cb80ff',
+                            200: '#373737',
+                        },
+                        text: {
+                            100: '#ffffff',
+                            200: '#e0e0e0',
+                        },
+                        bg: {
+                            100: '#241b35',
+                            200: '#342a45',
+                            300: '#4d425f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        async function requestVoicePermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('Microphone permission granted');
+                // Stop the stream since we only needed it for permission
+                stream.getTracks().forEach(track => track.stop());
+            } catch (err) {
+                console.error('Microphone permission denied:', err);
+                alert('Please allow microphone access to use voice input.');
+            }
+        }
+    </script>
+</head>
+<body class="bg-bg-100 min-h-screen p-8 flex items-center justify-center">
+    <main class="w-full max-w-4xl">
+
+        <div class="flex justify-between items-center mb-12">
+            <h1 class="text-text-100 text-2xl font-bold">Triage Ai</h1>
+        </div>
+
+
+        <div class="bg-bg-200 bg-opacity-50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
+
+            <div class="h-64 mb-8 bg-bg-300 bg-opacity-30 rounded-2xl p-6">
+                <div class="text-text-200 opacity-80">
+                    Hi, I'm Triage Ai. How can I assist you today?
+                </div>
+            </div>
+
+            <!-- Voice Button -->
+            <div class="flex justify-center">
+                <button 
+                    onclick="requestVoicePermission()"
+                    class="w-32 h-32 rounded-full bg-primary-100 bg-opacity-20 backdrop-blur-md flex items-center justify-center group transition-all hover:bg-opacity-30">
+                    <div class="w-24 h-24 rounded-full bg-primary-200 bg-opacity-40 flex items-center justify-center group-hover:scale-95 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-text-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                    </div>
+                </button>
+            </div>
+
+            <div class="text-center mt-6">
+                <p class="text-text-200 text-sm">Press To Talk Your Symptom</p>
+            </div>
+        </div>
+    </main>
+</body>
 </html>
