@@ -45,6 +45,9 @@
                 alert('Please allow microphone access to use voice input.');
             }
         }
+
+        // Request permission when page loads
+        document.addEventListener('DOMContentLoaded', requestVoicePermission);
     </script>
 </head>
 <body class="bg-bg-100 min-h-screen p-8 flex items-center justify-center">
@@ -66,7 +69,7 @@
             <!-- Voice Button -->
             <div class="flex justify-center">
                 <button 
-                    onclick="requestVoicePermission()"
+                onclick=""
                     class="w-32 h-32 rounded-full bg-primary-100 bg-opacity-20 backdrop-blur-md flex items-center justify-center group transition-all hover:bg-opacity-30">
                     <div class="w-24 h-24 rounded-full bg-primary-200 bg-opacity-40 flex items-center justify-center group-hover:scale-95 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-text-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
