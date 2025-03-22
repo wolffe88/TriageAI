@@ -65,7 +65,7 @@
           });
         }
         async function speak() {
-          const text = document.getElementById("text-to-speak").value;
+          const text = document.getElementById("transcript").innerText;
           const voice = document.getElementById("voice-select").value;
           const resp = await fetch("/tts/", {
             method:"POST",
@@ -106,7 +106,7 @@
                     </div>
                 </button>
                 <select id="voice-select"></select>
-                <input id="text-to-speak" placeholder="Enter text"/>
+                <!-- <input id="text-to-speak" placeholder="Enter text"/> -->
                 <button 
                     onclick="speak()"
                     class="w-32 h-32 rounded-full bg-primary-100 bg-opacity-20 backdrop-blur-md flex items-center justify-center group transition-all hover:bg-opacity-30">

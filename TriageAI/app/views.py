@@ -3,6 +3,14 @@ from django.conf import settings
 import os, json, requests
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from transformers import pipeline
+
+generator = pipeline(
+    "text-generation",
+    model="/full/path/to/your/mistral-model",
+    device=0
+)
 
 API_KEY = settings.ELEVENLABS_API_KEY
 
@@ -23,4 +31,11 @@ def tts(request):
 
 def index(request):
     return render(request, "app/index.html")
+
+
+
+def generate(request):
+    prompt = request.GET.get("prompt", "")               # grab ?prompt=... from URL
+    result = generator(prompt, max_new_tokens=100)[0]    # generate up to 100 tokens
+    return JsonResponse({"text": result["generated_text"]})  
 
