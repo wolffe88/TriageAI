@@ -59,7 +59,7 @@
     </script> -->
     <script>
         async function loadVoices() {
-          const resp = await fetch("/voices/");              // fetch available voices
+          const resp = await fetch("/voices/");            
           const { voices } = await resp.json();
           voices.forEach(v => {
             const o = document.createElement("option");
@@ -75,14 +75,26 @@
             headers: {"Content-Type":"application/json"},
             body: JSON.stringify({text, voice_id: voice})
           });
-          const audioBlob = await resp.blob();                // get MP3 bytes
-          new Audio(URL.createObjectURL(audioBlob)).play();    // play it
+          const audioBlob = await resp.blob();               
+          new Audio(URL.createObjectURL(audioBlob)).play();
         }
-        window.onload = loadVoices();                          // populate voices on load
+        window.onload = loadVoices();                 
 
-        // Request permission when page loads
         document.addEventListener('DOMContentLoaded', requestVoicePermission);
 
+    </script>
+    <script>
+        async function askModel() {
+          const prompt = document.getElementById("input").value;             
+          const res = await fetch("/generate/", {                            
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ prompt })
+          });
+          const { text } = await res.json();                                       
+          document.getElementById("transcript").innerText = text;                 
+          speak();                                                                  
+        }
     </script>
 </head>
 <body class="bg-bg-100 min-h-screen p-8 flex items-center justify-center">
@@ -97,7 +109,7 @@
 
             <div class="h-64 mb-8 bg-bg-300 bg-opacity-30 rounded-2xl p-6">
                 <div id="transcript" class="text-text-200 opacity-80">
-                    Hi, I'm Triage Ai. How can I assist you today?
+                    Hi, I'm Triage AI. How can I assist you today?
                 </div>
             </div>
 
@@ -136,7 +148,7 @@
                             placeholder="Describe your symptoms..."
                         />
                         <button 
-                            onclick="submit()"
+                            onclick="askModel()"
                             class="px-6 rounded-xl bg-primary-100 bg-opacity-20 backdrop-blur-md hover:bg-opacity-30 text-text-100 flex items-center justify-center transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
@@ -144,15 +156,6 @@
                         </button>
                     </div>
                 </div>
-
-                </button>
-                <select id="voice-select"></select>
-                <!-- <input id="text-to-speak" placeholder="Enter text"/> -->
-                <button 
-                    onclick="speak()"
-                    class="w-32 h-32 rounded-full bg-primary-100 bg-opacity-20 backdrop-blur-md flex items-center justify-center group transition-all hover:bg-opacity-30">
-                    Speak
-                </button>
 
             </div>
 
